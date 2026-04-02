@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jesyon Biznis / Gestion Entreprise</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161922;
+  --surface2: #1e2330;
+  --border: #2a3045;
+  --accent: #e63946;
+  --gold: #ffd166;
+  --green: #06d6a0;
+  --orange: #f4a261;
+  --text: #eef0f4;
+  --muted: #7a8299;
+  --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+#setupScreen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #0d0f14 0%, #1a0d20 100%);
+}
+#loginScreen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #0d0f14 0%, #1a0d20 100%);
+}
+.login-box, .setup-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 24px; padding: 40px; width: 100%; max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.setup-box { border-color: var(--gold); text-align: center; }
+.box-icon { font-size: 3rem; margin-bottom: 12px; }
+.box-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+.box-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 24px; }
+.gold-title { color: var(--gold); }
+.role-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.role-tab {
+  flex: 1; padding: 10px; border-radius: 10px;
+  border: 2px solid var(--border); background: var(--surface2);
+  color: var(--muted); font-family: 'Sora', sans-serif;
+  font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+}
+.role-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(230,57,70,0.1); }
+.inp {
+  width: 100%; padding: 13px 16px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: 'Sora', sans-serif;
+  font-size: 0.9rem; margin-bottom: 14px; outline: none; transition: border 0.2s;
+}
+.inp:focus { border-color: var(--accent); }
+.btn {
+  width: 100%; padding: 14px; border-radius: 10px; border: none;
+  font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.95rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: #fff; margin-bottom: 8px; }
+.btn-primary:hover { background: #c1121f; transform: translateY(-1px); }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-sm {
+  padding: 8px 16px; border-radius: 8px; border: none;
+  font-family: 'Sora', sans-serif; font-weight: 600; font-size: 0.8rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-add { background: var(--green); color: #0d0f14; }
+.btn-edit { background: var(--gold); color: #0d0f14; }
+.btn-del { background: var(--accent); color: #fff; }
+.btn-print { background: var(--orange); color: #0d0f14; }
+.err-msg { color: var(--accent); font-size: 0.8rem; text-align: center; margin-top: 8px; min-height: 20px; }
+
+/* APP */
+#appScreen { display: none; }
+.topbar {
+  background: var(--surface); border-bottom: 2px solid var(--accent);
+  padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(230,57,70,0.1);
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-info h1 { font-size: 1rem; font-weight: 800; }
+.topbar-info p { font-size: 0.7rem; color: var(--muted); }
+.user-badge { display: flex; align-items: center; gap: 10px; }
+.role-pill { padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; }
+.role-pill.adm { background: rgba(230,57,70,0.2); color: var(--accent); border: 1px solid var(--accent); }
+.role-pill.vendeur { background: rgba(6,214,160,0.2); color: var(--green); border: 1px solid var(--green); }
+.logout-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); padding: 7px 14px; border-radius: 8px;
+  font-family: 'Sora', sans-serif; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+}
+.logout-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+nav {
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  padding: 0 24px; display: flex; gap: 4px; overflow-x: auto;
+}
+.nav-btn {
+  padding: 14px 18px; border: none; background: none;
+  color: var(--muted); font-family: 'Sora', sans-serif;
+  font-weight: 600; font-size: 0.82rem; cursor: pointer;
+  border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap;
+}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.content { padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+.page { display: none; }
+.page.active { display: block; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+.stat-red::before { background: var(--accent); }
+.stat-gold::before { background: var(--gold); }
+.stat-green::before { background: var(--green); }
+.stat-orange::before { background: var(--orange); }
+.stat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.stat-value { font-family: 'DM Mono', monospace; font-size: 1.6rem; font-weight: 500; }
+.stat-red .stat-value { color: var(--accent); }
+.stat-gold .stat-value { color: var(--gold); }
+.stat-green .stat-value { color: var(--green); }
+.stat-orange .stat-value { color: var(--orange); }
+
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.section-title { font-size: 1.1rem; font-weight: 700; }
+.search-inp {
+  padding: 9px 16px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: 'Sora', sans-serif;
+  font-size: 0.85rem; outline: none; width: 220px;
+}
+.search-inp:focus { border-color: var(--accent); }
+
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; }
+thead { background: var(--surface2); }
+th { padding: 13px 16px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); font-weight: 600; }
+td { padding: 13px 16px; border-top: 1px solid var(--border); font-size: 0.87rem; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.mono { font-family: 'DM Mono', monospace; }
+.badge-green { background: rgba(6,214,160,0.15); color: var(--green); padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-red { background: rgba(230,57,70,0.15); color: var(--accent); padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-gold { background: rgba(255,209,102,0.15); color: var(--gold); padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.actions { display: flex; gap: 6px; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center; z-index: 999; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px; width: 100%; max-width: 500px;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; color: var(--gold); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+.modal-actions .btn { flex: 1; margin: 0; }
+
+.sale-form {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; margin-bottom: 24px;
+}
+.sale-form h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--green); }
+.sale-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 12px; }
+.sale-grid2 { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
+.field-label { font-size: 0.72rem; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; }
+.sale-total-box {
+  background: var(--surface2); border: 1px solid var(--gold);
+  border-radius: 12px; padding: 14px 20px; text-align: center;
+}
+.sale-total-box p { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+.sale-total-box .amount { font-family: 'DM Mono', monospace; font-size: 1.8rem; color: var(--gold); font-weight: 500; }
+.btn-do-sale {
+  padding: 13px 24px; border-radius: 10px; border: none;
+  background: var(--green); color: #0d0f14;
+  font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.9rem;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.btn-do-sale:hover { background: #04b888; }
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.dash-card-title { font-weight: 700; margin-bottom: 14px; }
+.recent-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.recent-item:last-child { border-bottom: none; }
+
+.empty { text-align: center; padding: 40px; color: var(--muted); }
+.empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+.params-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px; max-width: 500px;
+}
+.danger-zone { color: var(--accent); font-weight: 700; margin-bottom: 12px; margin-top: 24px; }
+
+@media print {
+  body * { visibility: hidden; }
+  #printZone, #printZone * { visibility: visible; }
+  #printZone { position: fixed; inset: 0; background: white; color: black; font-family: monospace; padding: 20px; }
+}
+#printZone { display: none; }
+
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 12px 22px; border-radius: 10px;
+  font-weight: 700; font-size: 0.87rem;
+  display: none; z-index: 9999;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .sale-grid { grid-template-columns: 1fr 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .content { padding: 16px; }
+  .topbar { padding: 12px 16px; }
+  nav { padding: 0 8px; }
+  .search-inp { width: 160px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setupScreen">
+  <div class="setup-box">
+    <div class="box-icon">🏢</div>
+    <h2 class="box-title gold-title">Byenveni / Bienvenue</h2>
+    <p class="box-sub">Konfigire antrepriz ou a / Configurez votre entreprise</p>
+    <input class="inp" id="setupCompany" placeholder="Non Antrepriz / Nom Entreprise" style="text-align:center;font-size:1rem;font-weight:700;" />
+    <input class="inp" id="setupAdmPass" type="password" placeholder="Modpas ADM / Mot de passe ADM" />
+    <input class="inp" id="setupVendPass" type="password" placeholder="Modpas Vendeur (defòl: 1234)" />
+    <button class="btn btn-primary" onclick="setupCompany()">✅ Kòmanse / Commencer</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen" style="display:none;">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div class="box-icon">🏪</div>
+      <h2 class="box-title" id="loginCompanyTitle">...</h2>
+      <p class="box-sub">Sistèm Jesyon / Système de Gestion</p>
+    </div>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="selectRole('adm',this)">👑 ADM</button>
+      <button class="role-tab" onclick="selectRole('vendeur',this)">🧑‍💼 Vendeur</button>
+    </div>
+    <input class="inp" id="loginUser" placeholder="Non itilizatè / Nom d'utilisateur" />
+    <input class="inp" id="loginPass" type="password" placeholder="Modpas / Mot de passe" />
+    <button class="btn btn-primary" onclick="doLogin()">🔐 Konekte / Connexion</button>
+    <div class="err-msg" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div style="font-size:1.8rem;">🏪</div>
+      <div class="topbar-info">
+        <h1 id="appCompanyName">Entreprise</h1>
+        <p>Jesyon Biznis / Gestion Entreprise</p>
+      </div>
+    </div>
+    <div class="user-badge">
+      <span class="role-pill" id="rolePill">ADM</span>
+      <span id="userNameDisplay" style="font-size:0.82rem;font-weight:600;"></span>
+      <button class="logout-btn" onclick="logout()">⬅ Dekonekte</button>
+    </div>
+  </div>
+
+  <nav id="mainNav">
+    <button class="nav-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="nav-btn" onclick="showPage('produits')">📦 Pwodui</button>
+    <button class="nav-btn" onclick="showPage('ventes')">🧾 Vant</button>
+    <button class="nav-btn" onclick="showPage('clients')">👥 Kliyan</button>
+    <button class="nav-btn adm-only" onclick="showPage('vendeurs')">🧑‍💼 Vendè</button>
+    <button class="nav-btn adm-only" onclick="showPage('rapports')">📈 Rapò</button>
+    <button class="nav-btn adm-only" onclick="showPage('parametres')">⚙️ Paramèt</button>
+  </nav>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card stat-red"><div class="stat-label">📦 Total Pwodui</div><div class="stat-value" id="s-produits">0</div></div>
+        <div class="stat-card stat-gold"><div class="stat-label">🧾 Vant Jodi HTG</div><div class="stat-value" id="s-ventes">0</div></div>
+        <div class="stat-card stat-green"><div class="stat-label">💰 Benefis Jodi HTG</div><div class="stat-value" id="s-benefis">0</div></div>
+        <div class="stat-card stat-orange"><div class="stat-label">👥 Total Kliyan</div><div class="stat-value" id="s-clients">0</div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-title" style="color:var(--gold);">🕐 Dènye Vant</div>
+          <div id="recentSales"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title" style="color:var(--accent);">⚠️ Estòk Ba</div>
+          <div id="lowStock"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUITS -->
+    <div class="page" id="page-produits">
+      <div class="section-header">
+        <span class="section-title">📦 Pwodui / Produits</span>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input class="search-inp" id="searchProduit" placeholder="🔍 Chèche..." oninput="renderProduits()" />
+          <button class="btn-sm btn-add" id="btnAddProduit" onclick="openProduitModal()">+ Ajoute</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Non / Nom</th><th>Kategori</th><th>Estòk</th>
+            <th>Pri Achte HTG</th><th>Pri Vant HTG</th><th>Benefis</th><th>Aksyon</th>
+          </tr></thead>
+          <tbody id="produitTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VENTES -->
+    <div class="page" id="page-ventes">
+      <div class="sale-form">
+        <h3>🧾 Nouvo Vant / Nouvelle Vente</h3>
+        <div class="sale-grid">
+          <div>
+            <span class="field-label">Pwodui / Produit</span>
+            <select class="inp" id="saleProduit" onchange="updateSaleTotal()" style="margin:0;"></select>
+          </div>
+          <div>
+            <span class="field-label">Kliyan / Client</span>
+            <select class="inp" id="saleClient" style="margin:0;"></select>
+          </div>
+          <div>
+            <span class="field-label">Kantite / Qté</span>
+            <input class="inp" type="number" id="saleQty" value="1" min="1" oninput="updateSaleTotal()" style="margin:0;" />
+          </div>
+          <div>
+            <button class="btn-do-sale" onclick="doSale()">✅ Vann</button>
+          </div>
+        </div>
+        <div class="sale-grid2">
+          <div>
+            <span class="field-label">Nòt / Note (opsyonèl)</span>
+            <input class="inp" id="saleNote" placeholder="Nòt..." style="margin:0;" />
+          </div>
+          <div class="sale-total-box">
+            <p>TOTAL HTG</p>
+            <div class="amount" id="saleTotalDisplay">0.00</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-header">
+        <span class="section-title">📋 Istwa Vant / Historique</span>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input class="search-inp" id="searchVente" placeholder="🔍 Chèche..." oninput="renderVentes()" />
+          <button class="btn-sm btn-print" onclick="printAllSales()">🖨️ Enprime Tout</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Dat</th><th>Pwodui</th><th>Kliyan</th><th>Vendè</th>
+            <th>Qté</th><th>Total HTG</th><th>Benefis</th><th>Aksyon</th>
+          </tr></thead>
+          <tbody id="venteTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="page" id="page-clients">
+      <div class="section-header">
+        <span class="section-title">👥 Kliyan / Clients</span>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input class="search-inp" id="searchClient" placeholder="🔍 Chèche..." oninput="renderClients()" />
+          <button class="btn-sm btn-add" onclick="openClientModal()">+ Ajoute</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Non / Nom</th><th>Telefòn</th><th>Adrès</th><th>Total Achte HTG</th><th>Aksyon</th>
+          </tr></thead>
+          <tbody id="clientTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VENDEURS -->
+    <div class="page" id="page-vendeurs">
+      <div class="section-header">
+        <span class="section-title">🧑‍💼 Vendè / Vendeurs</span>
+        <button class="btn-sm btn-add" onclick="openVendeurModal()">+ Ajoute</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Non Konplè</th><th>Non Itilizatè</th><th>Kantite Vant</th><th>Total HTG</th><th>Aksyon</th>
+          </tr></thead>
+          <tbody id="vendeurTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RAPPORTS -->
+    <div class="page" id="page-rapports">
+      <div class="section-header">
+        <span class="section-title">📈 Rapò / Rapports</span>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input type="date" class="inp" id="rFrom" style="width:160px;margin:0;" />
+          <input type="date" class="inp" id="rTo" style="width:160px;margin:0;" />
+          <button class="btn-sm btn-add" onclick="genRapport()">📊 Jenere</button>
+          <button class="btn-sm btn-print" onclick="printRapport()">🖨️ Enprime</button>
+        </div>
+      </div>
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat-card stat-gold"><div class="stat-label">Total Vant HTG</div><div class="stat-value" id="r-vant">—</div></div>
+        <div class="stat-card stat-green"><div class="stat-label">Total Benefis HTG</div><div class="stat-value" id="r-benefis">—</div></div>
+        <div class="stat-card stat-red"><div class="stat-label">Nòm Tranzaksyon</div><div class="stat-value" id="r-nb">—</div></div>
+        <div class="stat-card stat-orange"><div class="stat-label">Mwayèn pa Vant</div><div class="stat-value" id="r-moy">—</div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Vendè</th><th>Kantite Vant</th><th>Total HTG</th><th>Benefis HTG</th></tr></thead>
+          <tbody id="r-vendeurs"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PARAMETRES -->
+    <div class="page" id="page-parametres">
+      <div class="section-title" style="margin-bottom:20px;">⚙️ Paramèt Antrepriz</div>
+      <div class="params-box">
+        <div class="form-group"><label>Non Antrepriz</label><input class="inp" id="paramCompany" style="margin:0;" /></div>
+        <div class="form-group"><label>Nouvo Modpas ADM (kite vid si pa chanje)</label><input class="inp" type="password" id="paramAdmPass" style="margin:0;" /></div>
+        <div class="form-group"><label>Nouvo Modpas Vendeur</label><input class="inp" type="password" id="paramVendPass" style="margin:0;" /></div>
+        <button class="btn btn-primary" style="width:auto;padding:12px 28px;" onclick="saveParams()">💾 Anrejistre</button>
+        <hr style="border-color:var(--border);margin:24px 0;">
+        <div style="color:var(--green);font-weight:700;margin-bottom:6px;">💾 Backup / Sovgad Done</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">Ekspòte tout done ou yo nan yon fichye pou pa pèdi yo. Enpòte pou restore.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+          <button class="btn-sm btn-add" onclick="exportData()" style="padding:12px 20px;font-size:0.85rem;">📤 Ekspòte Done (Backup)</button>
+          <label class="btn-sm btn-print" style="padding:12px 20px;font-size:0.85rem;cursor:pointer;">
+            📥 Enpòte Done (Restore)
+            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)" />
+          </label>
+        </div>
+        <div id="backupInfo" style="font-size:0.78rem;color:var(--muted);margin-top:8px;"></div>
+        <hr style="border-color:var(--border);margin:24px 0;">
+        <div class="danger-zone">⚠️ Zòn Danje / Zone Danger</div>
+        <button class="btn btn-secondary" style="width:auto;padding:10px 20px;border-color:var(--accent);color:var(--accent);" onclick="clearAll()">🗑️ Efase Tout Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PRODUIT -->
+<div class="modal-overlay" id="modalProduit">
+  <div class="modal">
+    <h3 id="mProduitTitle">📦 Ajoute Pwodui</h3>
+    <div class="form-group"><label>Non Pwodui *</label><input class="inp" id="pNom" style="margin:0;" /></div>
+    <div class="form-group"><label>Kategori</label><input class="inp" id="pKat" placeholder="ex: Aliman, Bwason..." style="margin:0;" /></div>
+    <div class="form-row">
+      <div class="form-group"><label>Estòk / Stock</label><input class="inp" type="number" id="pStock" value="0" style="margin:0;" /></div>
+      <div class="form-group"><label>Alèt Estòk Min</label><input class="inp" type="number" id="pStockMin" value="5" style="margin:0;" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Pri Achte HTG *</label><input class="inp" type="number" id="pAchte" step="0.01" oninput="calcBen()" style="margin:0;" /></div>
+      <div class="form-group"><label>Pri Vant HTG *</label><input class="inp" type="number" id="pVant" step="0.01" oninput="calcBen()" style="margin:0;" /></div>
+    </div>
+    <div style="background:var(--surface2);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="color:var(--muted);font-size:0.82rem;">Benefis pa inite / Bénéfice unitaire:</span>
+      <span id="mBenefis" style="color:var(--green);font-family:'DM Mono',monospace;font-weight:600;">0.00 HTG</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modalProduit')">Anile</button>
+      <button class="btn btn-primary" onclick="saveProduit()" style="margin:0;">💾 Anrejistre</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENT -->
+<div class="modal-overlay" id="modalClient">
+  <div class="modal">
+    <h3 id="mClientTitle">👥 Ajoute Kliyan</h3>
+    <div class="form-group"><label>Non Kliyan *</label><input class="inp" id="cNom" style="margin:0;" /></div>
+    <div class="form-group"><label>Nimewo Telefòn</label><input class="inp" id="cTel" placeholder="+509..." style="margin:0;" /></div>
+    <div class="form-group"><label>Adrès / Adresse</label><input class="inp" id="cAdresse" style="margin:0;" /></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modalClient')">Anile</button>
+      <button class="btn btn-primary" onclick="saveClient()" style="margin:0;">💾 Anrejistre</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VENDEUR -->
+<div class="modal-overlay" id="modalVendeur">
+  <div class="modal">
+    <h3>🧑‍💼 Ajoute Vendè</h3>
+    <div class="form-group"><label>Non Konplè *</label><input class="inp" id="vNom" style="margin:0;" /></div>
+    <div class="form-group"><label>Non Itilizatè (Username) *</label><input class="inp" id="vUser" style="margin:0;" /></div>
+    <div class="form-group"><label>Modpas *</label><input class="inp" type="password" id="vPass" style="margin:0;" /></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modalVendeur')">Anile</button>
+      <button class="btn btn-primary" onclick="saveVendeur()" style="margin:0;">💾 Anrejistre</button>
+    </div>
+  </div>
+</div>
+
+<div id="printZone"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+let DB = { company:'', admPass:'', vendPass:'1234', produits:[], clients:[], vendeurs:[], ventes:[] };
+let CU = null; // current user
+let editPId = null, editCId = null;
+let selRole = 'adm';
+
+function init() {
+  const s = localStorage.getItem('biz_db');
+  if (s) DB = JSON.parse(s);
+  if (!DB.company) {
+    show('setupScreen'); hide('loginScreen'); hide('appScreen');
+  } else {
+    hide('setupScreen'); show('loginScreen'); hide('appScreen');
+    document.getElementById('loginCompanyTitle').textContent = DB.company;
+  }
+}
+
+function save() { localStorage.setItem('biz_db', JSON.stringify(DB)); }
+function show(id) { document.getElementById(id).style.display = 'flex'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function uid() { return Math.random().toString(36).substr(2,9) + Date.now().toString(36); }
+function fmt(n) { return (n||0).toLocaleString('fr',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+// ===== SETUP =====
+function setupCompany() {
+  const c = document.getElementById('setupCompany').value.trim();
+  const a = document.getElementById('setupAdmPass').value;
+  const v = document.getElementById('setupVendPass').value;
+  if (!c) return toast('⚠️ Mete non antrepriz la!', true);
+  if (!a) return toast('⚠️ Mete modpas ADM!', true);
+  DB.company = c; DB.admPass = a; DB.vendPass = v||'1234';
+  save();
+  hide('setupScreen');
+  document.getElementById('loginCompanyTitle').textContent = DB.company;
+  show('loginScreen');
+}
+
+// ===== LOGIN =====
+function selectRole(r, el) {
+  selRole = r;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  if (selRole === 'adm') {
+    if (pass !== DB.admPass) return (err.textContent = '❌ Modpas ADM pa kòrèk!');
+    CU = { role:'adm', name: user||'Administrateur' };
+  } else {
+    const v = DB.vendeurs.find(x => x.username===user && x.password===pass);
+    if (v) { CU = { role:'vendeur', name:v.nom, vid:v.id }; }
+    else if (pass===DB.vendPass) { CU = { role:'vendeur', name:user||'Vendeur' }; }
+    else return (err.textContent = '❌ Itilizatè oswa modpas pa kòrèk!');
+  }
+  hide('loginScreen');
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('appCompanyName').textContent = DB.company;
+  const pill = document.getElementById('rolePill');
+  pill.textContent = CU.role==='adm' ? '👑 ADM' : '🧑‍💼 Vendeur';
+  pill.className = 'role-pill ' + CU.role;
+  document.getElementById('userNameDisplay').textContent = CU.name;
+  document.querySelectorAll('.adm-only').forEach(el => el.style.display = CU.role==='adm' ? 'block':'none');
+  document.getElementById('btnAddProduit').style.display = CU.role==='adm' ? 'inline-block':'none';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('rFrom').value = today;
+  document.getElementById('rTo').value = today;
+  showPage('dashboard'); refreshAll();
+}
+
+function logout() {
+  CU = null;
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').textContent = '';
+  show('loginScreen');
+}
+
+// ===== NAV =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+  });
+  if (id==='ventes') refreshSaleForm();
+  if (id==='parametres') document.getElementById('paramCompany').value = DB.company;
+}
+
+function refreshAll() {
+  refreshDashboard(); renderProduits(); renderVentes(); renderClients(); renderVendeurs();
+}
+
+// ===== DASHBOARD =====
+function refreshDashboard() {
+  document.getElementById('s-produits').textContent = DB.produits.length;
+  document.getElementById('s-clients').textContent = DB.clients.length;
+  const today = new Date().toDateString();
+  const ts = DB.ventes.filter(v => new Date(v.date).toDateString()===today);
+  document.getElementById('s-ventes').textContent = fmt(ts.reduce((a,v)=>a+v.total,0));
+  document.getElementById('s-benefis').textContent = fmt(ts.reduce((a,v)=>a+v.benefis,0));
+
+  const rec = document.getElementById('recentSales');
+  const last5 = [...DB.ventes].reverse().slice(0,5);
+  rec.innerHTML = last5.length ? last5.map(v=>`
+    <div class="recent-item">
+      <div><div style="font-weight:600;font-size:0.85rem;">${v.produitNom}</div>
+      <div style="font-size:0.72rem;color:var(--muted);">${v.clientNom} • ${new Date(v.date).toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'})}</div></div>
+      <div style="font-family:'DM Mono',monospace;color:var(--gold);font-weight:600;">${fmt(v.total)}</div>
+    </div>`).join('')
+  : '<div class="empty"><div class="empty-icon">🧾</div><p>Pa gen vant encore</p></div>';
+
+  const low = document.getElementById('lowStock');
+  const lp = DB.produits.filter(p=>p.stock<=p.stockMin);
+  low.innerHTML = lp.length ? lp.map(p=>`
+    <div class="recent-item">
+      <div style="font-weight:600;font-size:0.85rem;">${p.nom}</div>
+      <span class="badge-red">${p.stock} rès</span>
+    </div>`).join('')
+  : '<div class="empty"><div class="empty-icon">✅</div><p>Tout estòk bon!</p></div>';
+}
+
+// ===== PRODUITS =====
+function renderProduits() {
+  const q = (document.getElementById('searchProduit')?.value||'').toLowerCase();
+  const list = DB.produits.filter(p=>p.nom.toLowerCase().includes(q)||(p.kategori||'').toLowerCase().includes(q));
+  const tb = document.getElementById('produitTable');
+  if (!list.length) { tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-icon">📦</div><p>Pa gen pwodui</p></div></td></tr>`; return; }
+  const isAdm = CU&&CU.role==='adm';
+  tb.innerHTML = list.map(p=>{
+    const ben = p.vant-p.achte;
+    return `<tr>
+      <td><strong>${p.nom}</strong></td>
+      <td>${p.kategori?`<span class="badge-gold">${p.kategori}</span>`:'—'}</td>
+      <td><span class="${p.stock<=p.stockMin?'badge-red':'badge-green'}">${p.stock}</span></td>
+      <td class="mono">${fmt(p.achte)}</td>
+      <td class="mono">${fmt(p.vant)}</td>
+      <td class="mono" style="color:var(--green);">${fmt(ben)}</td>
+      <td class="actions">${isAdm?`<button class="btn-sm btn-edit" onclick="editProduit('${p.id}')">✏️</button>
+        <button class="btn-sm btn-del" onclick="delProduit('${p.id}')">🗑️</button>`:'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openProduitModal(id) {
+  editPId = id||null;
+  document.getElementById('mProduitTitle').textContent = id ? '✏️ Modifye Pwodui' : '📦 Ajoute Pwodui';
+  if (id) {
+    const p = DB.produits.find(x=>x.id===id);
+    document.getElementById('pNom').value=p.nom;
+    document.getElementById('pKat').value=p.kategori||'';
+    document.getElementById('pStock').value=p.stock;
+    document.getElementById('pStockMin').value=p.stockMin||5;
+    document.getElementById('pAchte').value=p.achte;
+    document.getElementById('pVant').value=p.vant;
+    calcBen();
+  } else {
+    ['pNom','pKat','pAchte','pVant'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('pStock').value=0;
+    document.getElementById('pStockMin').value=5;
+    document.getElementById('mBenefis').textContent='0.00 HTG';
+  }
+  document.getElementById('modalProduit').classList.add('open');
+}
+
+function editProduit(id) { openProduitModal(id); }
+
+function calcBen() {
+  const a=parseFloat(document.getElementById('pAchte').value)||0;
+  const v=parseFloat(document.getElementById('pVant').value)||0;
+  document.getElementById('mBenefis').textContent=fmt(v-a)+' HTG';
+}
+
+function saveProduit() {
+  const nom=document.getElementById('pNom').value.trim();
+  const achte=parseFloat(document.getElementById('pAchte').value);
+  const vant=parseFloat(document.getElementById('pVant').value);
+  if (!nom||isNaN(achte)||isNaN(vant)) return toast('⚠️ Ranpli Non, Pri Achte ak Pri Vant!',true);
+  const data = { nom, kategori:document.getElementById('pKat').value, stock:parseInt(document.getElementById('pStock').value)||0, stockMin:parseInt(document.getElementById('pStockMin').value)||5, achte, vant };
+  if (editPId) {
+    const i=DB.produits.findIndex(p=>p.id===editPId);
+    DB.produits[i]={...DB.produits[i],...data};
+    toast('✅ Pwodui modifye!');
+  } else {
+    DB.produits.push({id:uid(),...data});
+    toast('✅ Pwodui ajoute!');
+  }
+  save(); closeModal('modalProduit'); renderProduits(); refreshDashboard();
+}
+
+function delProduit(id) {
+  if (!confirm('Efase pwodui sa a?')) return;
+  DB.produits=DB.produits.filter(p=>p.id!==id);
+  save(); renderProduits(); refreshDashboard(); toast('🗑️ Efase!');
+}
+
+// ===== VENTES =====
+function refreshSaleForm() {
+  const sp=document.getElementById('saleProduit');
+  const cur=sp.value;
+  sp.innerHTML='<option value="">— Chwazi Pwodui —</option>';
+  DB.produits.filter(p=>p.stock>0).forEach(p=>sp.innerHTML+=`<option value="${p.id}">${p.nom} (${p.stock} rès) — ${fmt(p.vant)} HTG</option>`);
+  if (cur) sp.value=cur;
+
+  const sc=document.getElementById('saleClient');
+  sc.innerHTML='<option value="walk-in">Kliyan Nòmal / Passage</option>';
+  DB.clients.forEach(c=>sc.innerHTML+=`<option value="${c.id}">${c.nom}</option>`);
+
+  updateSaleTotal();
+}
+
+function updateSaleTotal() {
+  const pid=document.getElementById('saleProduit').value;
+  const qty=parseInt(document.getElementById('saleQty').value)||1;
+  const p=DB.produits.find(x=>x.id===pid);
+  document.getElementById('saleTotalDisplay').textContent=p?fmt(p.vant*qty):'0.00';
+}
+
+function doSale() {
+  const pid=document.getElementById('saleProduit').value;
+  const qty=parseInt(document.getElementById('saleQty').value)||1;
+  const cid=document.getElementById('saleClient').value;
+  const note=document.getElementById('saleNote').value;
+  if (!pid) return toast('⚠️ Chwazi yon pwodui!',true);
+  const p=DB.produits.find(x=>x.id===pid);
+  if (!p) return;
+  if (p.stock<qty) return toast(`⚠️ Pa ase estòk! (${p.stock} disponib)`,true);
+  const c=DB.clients.find(x=>x.id===cid);
+  const total=p.vant*qty, benefis=(p.vant-p.achte)*qty;
+  const v = {
+    id:uid(), date:new Date().toISOString(),
+    produitId:pid, produitNom:p.nom,
+    clientId:cid, clientNom:c?c.nom:'Kliyan Nòmal',
+    vendeurId:CU.vid||'adm', vendeurNom:CU.name,
+    qty, prixVant:p.vant, prixAchte:p.achte, total, benefis, note
+  };
+  p.stock-=qty;
+  if (c) c.totalAchte=(c.totalAchte||0)+total;
+  DB.ventes.push(v);
+  save(); toast('✅ Vant anrejistre!');
+  renderVentes(); renderProduits(); refreshDashboard(); refreshSaleForm();
+  document.getElementById('saleQty').value=1;
+  document.getElementById('saleNote').value='';
+  document.getElementById('saleProduit').value='';
+  document.getElementById('saleTotalDisplay').textContent='0.00';
+  if (confirm('📄 Enprime resi / Imprimer reçu?')) printReceipt(v);
+}
+
+function renderVentes() {
+  const q=(document.getElementById('searchVente')?.value||'').toLowerCase();
+  const list=DB.ventes.filter(v=>v.produitNom.toLowerCase().includes(q)||v.clientNom.toLowerCase().includes(q)||v.vendeurNom.toLowerCase().includes(q));
+  const tb=document.getElementById('venteTable');
+  if (!list.length) { tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">🧾</div><p>Pa gen vant</p></div></td></tr>`; return; }
+  tb.innerHTML=[...list].reverse().map(v=>`<tr>
+    <td style="font-size:0.78rem;">${new Date(v.date).toLocaleString('fr')}</td>
+    <td><strong>${v.produitNom}</strong></td>
+    <td>${v.clientNom}</td>
+    <td>${v.vendeurNom}</td>
+    <td class="mono">${v.qty}</td>
+    <td class="mono" style="color:var(--gold);">${fmt(v.total)}</td>
+    <td class="mono" style="color:var(--green);">${fmt(v.benefis)}</td>
+    <td><button class="btn-sm btn-print" onclick='printReceipt(${JSON.stringify(v)})'>🖨️</button></td>
+  </tr>`).join('');
+}
+
+// ===== CLIENTS =====
+function renderClients() {
+  const q=(document.getElementById('searchClient')?.value||'').toLowerCase();
+  const list=DB.clients.filter(c=>c.nom.toLowerCase().includes(q)||(c.tel||'').includes(q));
+  const tb=document.getElementById('clientTable');
+  if (!list.length) { tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="empty-icon">👥</div><p>Pa gen kliyan</p></div></td></tr>`; return; }
+  tb.innerHTML=list.map(c=>`<tr>
+    <td><strong>${c.nom}</strong></td>
+    <td class="mono">${c.tel||'—'}</td>
+    <td>${c.adresse||'—'}</td>
+    <td class="mono" style="color:var(--gold);">${fmt(c.totalAchte||0)}</td>
+    <td class="actions">
+      <button class="btn-sm btn-edit" onclick="editClient('${c.id}')">✏️</button>
+      <button class="btn-sm btn-del" onclick="delClient('${c.id}')">🗑️</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openClientModal() {
+  editCId=null;
+  document.getElementById('mClientTitle').textContent='👥 Ajoute Kliyan';
+  ['cNom','cTel','cAdresse'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('modalClient').classList.add('open');
+}
+
+function editClient(id) {
+  editCId=id;
+  const c=DB.clients.find(x=>x.id===id);
+  document.getElementById('mClientTitle').textContent='✏️ Modifye Kliyan';
+  document.getElementById('cNom').value=c.nom;
+  document.getElementById('cTel').value=c.tel||'';
+  document.getElementById('cAdresse').value=c.adresse||'';
+  document.getElementById('modalClient').classList.add('open');
+}
+
+function saveClient() {
+  const nom=document.getElementById('cNom').value.trim();
+  if (!nom) return toast('⚠️ Non kliyan obligatwa!',true);
+  const data={nom,tel:document.getElementById('cTel').value,adresse:document.getElementById('cAdresse').value};
+  if (editCId) {
+    const i=DB.clients.findIndex(c=>c.id===editCId);
+    DB.clients[i]={...DB.clients[i],...data};
+    toast('✅ Kliyan modifye!');
+  } else {
+    DB.clients.push({id:uid(),...data,totalAchte:0});
+    toast('✅ Kliyan ajoute!');
+  }
+  save(); closeModal('modalClient'); renderClients(); refreshDashboard();
+}
+
+function delClient(id) {
+  if (!confirm('Efase kliyan sa a?')) return;
+  DB.clients=DB.clients.filter(c=>c.id!==id);
+  save(); renderClients(); refreshDashboard(); toast('🗑️ Efase!');
+}
+
+// ===== VENDEURS =====
+function renderVendeurs() {
+  const tb=document.getElementById('vendeurTable');
+  if (!DB.vendeurs.length) { tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="empty-icon">🧑‍💼</div><p>Pa gen vendè</p></div></td></tr>`; return; }
+  tb.innerHTML=DB.vendeurs.map(v=>{
+    const s=DB.ventes.filter(x=>x.vendeurId===v.id);
+    return `<tr>
+      <td><strong>${v.nom}</strong></td>
+      <td class="mono">${v.username}</td>
+      <td><span class="badge-gold">${s.length}</span></td>
+      <td class="mono" style="color:var(--gold);">${fmt(s.reduce((a,x)=>a+x.total,0))}</td>
+      <td><button class="btn-sm btn-del" onclick="delVendeur('${v.id}')">🗑️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function openVendeurModal() {
+  ['vNom','vUser','vPass'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('modalVendeur').classList.add('open');
+}
+
+function saveVendeur() {
+  const nom=document.getElementById('vNom').value.trim();
+  const username=document.getElementById('vUser').value.trim();
+  const password=document.getElementById('vPass').value;
+  if (!nom||!username||!password) return toast('⚠️ Ranpli tout chan!',true);
+  if (DB.vendeurs.find(v=>v.username===username)) return toast('⚠️ Username deja egziste!',true);
+  DB.vendeurs.push({id:uid(),nom,username,password});
+  save(); closeModal('modalVendeur'); renderVendeurs(); toast('✅ Vendè ajoute!');
+}
+
+function delVendeur(id) {
+  if (!confirm('Efase vendè sa a?')) return;
+  DB.vendeurs=DB.vendeurs.filter(v=>v.id!==id);
+  save(); renderVendeurs(); toast('🗑️ Efase!');
+}
+
+// ===== RAPPORTS =====
+function genRapport() {
+  const from=new Date(document.getElementById('rFrom').value);
+  const to=new Date(document.getElementById('rTo').value); to.setHours(23,59,59);
+  const filt=DB.ventes.filter(v=>{const d=new Date(v.date);return d>=from&&d<=to;});
+  const total=filt.reduce((a,v)=>a+v.total,0);
+  const benefis=filt.reduce((a,v)=>a+v.benefis,0);
+  document.getElementById('r-vant').textContent=fmt(total);
+  document.getElementById('r-benefis').textContent=fmt(benefis);
+  document.getElementById('r-nb').textContent=filt.length;
+  document.getElementById('r-moy').textContent=filt.length?fmt(total/filt.length):'0.00';
+  const bv={};
+  filt.forEach(v=>{ if(!bv[v.vendeurNom])bv[v.vendeurNom]={nb:0,total:0,ben:0}; bv[v.vendeurNom].nb++; bv[v.vendeurNom].total+=v.total; bv[v.vendeurNom].ben+=v.benefis; });
+  const tb=document.getElementById('r-vendeurs');
+  const rows=Object.entries(bv);
+  tb.innerHTML=rows.length?rows.map(([nom,d])=>`<tr>
+    <td><strong>${nom}</strong></td><td>${d.nb}</td>
+    <td class="mono" style="color:var(--gold);">${fmt(d.total)}</td>
+    <td class="mono" style="color:var(--green);">${fmt(d.ben)}</td>
+  </tr>`).join(''):`<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted);">Pa gen done pou peryòd sa a</td></tr>`;
+}
+
+// ===== PARAMETRES =====
+function saveParams() {
+  const name=document.getElementById('paramCompany').value.trim();
+  if (!name) return toast('⚠️ Non antrepriz obligatwa!',true);
+  DB.company=name;
+  const ap=document.getElementById('paramAdmPass').value;
+  const vp=document.getElementById('paramVendPass').value;
+  if (ap) DB.admPass=ap;
+  if (vp) DB.vendPass=vp;
+  save();
+  document.getElementById('appCompanyName').textContent=DB.company;
+  document.getElementById('loginCompanyTitle').textContent=DB.company;
+  toast('✅ Paramèt anrejistre!');
+}
+
+// ===== BACKUP / RESTORE =====
+function exportData() {
+  const data = JSON.stringify(DB, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `backup-${DB.company.replace(/\s+/g,'-')}-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  const info = document.getElementById('backupInfo');
+  info.style.color = 'var(--green)';
+  info.textContent = `✅ Backup kreye: ${a.download}`;
+  toast('✅ Backup ekspòte ak siksè!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.json')) return toast('⚠️ Chwazi yon fichye .json sèlman!', true);
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      // Validate structure
+      if (!parsed.company || !Array.isArray(parsed.produits) || !Array.isArray(parsed.ventes)) {
+        return toast('⚠️ Fichye backup pa valid!', true);
+      }
+      if (!confirm(`Restore backup pou "${parsed.company}"?\n\nSa ap ranplase tout done aktyèl yo.\nPwodui: ${parsed.produits.length} | Vant: ${parsed.ventes.length} | Kliyan: ${parsed.clients.length}`)) {
+        event.target.value = '';
+        return;
+      }
+      DB = parsed;
+      save();
+      const info = document.getElementById('backupInfo');
+      info.style.color = 'var(--green)';
+      info.textContent = `✅ Restore siksè: ${parsed.produits.length} pwodui, ${parsed.ventes.length} vant, ${parsed.clients.length} kliyan`;
+      toast('✅ Done restore ak siksè!');
+      document.getElementById('appCompanyName').textContent = DB.company;
+      document.getElementById('paramCompany').value = DB.company;
+      refreshAll();
+    } catch(err) {
+      toast('⚠️ Erè lekti fichye a!', true);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function clearAll() {
+  if (!confirm('⚠️ Sa ap efase TOUT done nan aplikasyon an. Ou konfime?')) return;
+  if (!confirm('Dènye konfirmasyon: Efase tout?')) return;
+  localStorage.removeItem('biz_db');
+  location.reload();
+}
+
+// ===== PRINT =====
+function printReceipt(v) {
+  const z=document.getElementById('printZone');
+  z.style.display='block';
+  z.innerHTML=`<div style="max-width:350px;margin:0 auto;font-family:monospace;font-size:12px;">
+    <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:12px;">
+      <h2 style="font-size:1.3rem;margin-bottom:4px;">${DB.company}</h2>
+      <p>RESI VANT / REÇU DE VENTE</p>
+    </div>
+    <table style="width:100%;">
+      <tr><td>Dat:</td><td style="text-align:right;">${new Date(v.date).toLocaleString('fr')}</td></tr>
+      <tr><td>Vendè:</td><td style="text-align:right;">${v.vendeurNom}</td></tr>
+      <tr><td>Kliyan:</td><td style="text-align:right;">${v.clientNom}</td></tr>
+    </table>
+    <div style="border-top:1px dashed #000;border-bottom:1px dashed #000;padding:10px 0;margin:12px 0;">
+      <table style="width:100%;">
+        <tr><th style="text-align:left;">Pwodui</th><th>Qté</th><th style="text-align:right;">Unit.</th><th style="text-align:right;">Total</th></tr>
+        <tr><td>${v.produitNom}</td><td style="text-align:center;">${v.qty}</td><td style="text-align:right;">${fmt(v.prixVant)}</td><td style="text-align:right;">${fmt(v.total)}</td></tr>
+      </table>
+    </div>
+    ${v.note?`<p>Nòt: ${v.note}</p><br>`:''}
+    <div style="text-align:right;font-size:1.1rem;font-weight:bold;">TOTAL: ${fmt(v.total)} HTG</div>
+    <div style="text-align:center;margin-top:20px;font-size:0.75rem;">
+      Mèsi pou achte ou / Merci pour votre achat!<br>${DB.company}
+    </div>
+  </div>`;
+  window.print();
+  setTimeout(()=>z.style.display='none',1000);
+}
+
+function printAllSales() {
+  const z=document.getElementById('printZone');
+  z.style.display='block';
+  const tot=DB.ventes.reduce((a,v)=>a+v.total,0);
+  const ben=DB.ventes.reduce((a,v)=>a+v.benefis,0);
+  z.innerHTML=`<div style="font-family:monospace;font-size:11px;padding:20px;">
+    <h1 style="text-align:center;font-size:1.2rem;">${DB.company}</h1>
+    <h2 style="text-align:center;font-size:1rem;">FICH VANT KONPLÈ / FICHE DES VENTES</h2>
+    <p style="text-align:center;">Enprime: ${new Date().toLocaleString('fr')}</p>
+    <hr style="margin:12px 0;">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:#eee;">
+        <th style="border:1px solid #ccc;padding:5px;">Dat</th>
+        <th style="border:1px solid #ccc;padding:5px;">Pwodui</th>
+        <th style="border:1px solid #ccc;padding:5px;">Kliyan</th>
+        <th style="border:1px solid #ccc;padding:5px;">Vendè</th>
+        <th style="border:1px solid #ccc;padding:5px;">Qté</th>
+        <th style="border:1px solid #ccc;padding:5px;">Total HTG</th>
+        <th style="border:1px solid #ccc;padding:5px;">Benefis</th>
+      </tr></thead>
+      <tbody>${[...DB.ventes].reverse().map(v=>`<tr>
+        <td style="border:1px solid #ccc;padding:4px;">${new Date(v.date).toLocaleString('fr')}</td>
+        <td style="border:1px solid #ccc;padding:4px;">${v.produitNom}</td>
+        <td style="border:1px solid #ccc;padding:4px;">${v.clientNom}</td>
+        <td style="border:1px solid #ccc;padding:4px;">${v.vendeurNom}</td>
+        <td style="border:1px solid #ccc;padding:4px;text-align:center;">${v.qty}</td>
+        <td style="border:1px solid #ccc;padding:4px;text-align:right;">${fmt(v.total)}</td>
+        <td style="border:1px solid #ccc;padding:4px;text-align:right;">${fmt(v.benefis)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <hr style="margin:12px 0;">
+    <div style="text-align:right;font-weight:bold;">
+      <div>TOTAL VANT: ${fmt(tot)} HTG</div>
+      <div>TOTAL BENEFIS: ${fmt(ben)} HTG</div>
+    </div>
+  </div>`;
+  window.print();
+  setTimeout(()=>z.style.display='none',1000);
+}
+
+function printRapport() {
+  genRapport();
+  const from=document.getElementById('rFrom').value;
+  const to=document.getElementById('rTo').value;
+  const filt=DB.ventes.filter(v=>{const d=new Date(v.date);return d>=new Date(from)&&d<=new Date(to+'T23:59:59');});
+  const tot=filt.reduce((a,v)=>a+v.total,0);
+  const ben=filt.reduce((a,v)=>a+v.benefis,0);
+  const z=document.getElementById('printZone');
+  z.style.display='block';
+  z.innerHTML=`<div style="font-family:monospace;padding:20px;">
+    <h1 style="text-align:center;">${DB.company}</h1>
+    <h2 style="text-align:center;">RAPÒ PERYÒD: ${from} → ${to}</h2>
+    <p style="text-align:center;">Jenere: ${new Date().toLocaleString('fr')}</p>
+    <hr style="margin:12px 0;">
+    <p>Total Tranzaksyon: <strong>${filt.length}</strong></p>
+    <p>Total Vant: <strong>${fmt(tot)} HTG</strong></p>
+    <p>Total Benefis: <strong>${fmt(ben)} HTG</strong></p>
+    <p>Mwayèn pa Vant: <strong>${filt.length?fmt(tot/filt.length):0} HTG</strong></p>
+    <hr style="margin:12px 0;">
+    <h3>Pa Vendè / Par Vendeur:</h3>
+    ${document.getElementById('r-vendeurs').innerHTML.replace(/var\(--[^)]+\)/g,'#333')}
+  </div>`;
+  window.print();
+  setTimeout(()=>z.style.display='none',1000);
+}
+
+// ===== UTILS =====
+function toast(msg, isErr) {
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.background=isErr?'var(--accent)':'var(--green)';
+  el.style.color=isErr?'#fff':'#0d0f14';
+  el.style.display='block';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+});
+
+document.addEventListener('keypress',e=>{
+  if (e.key==='Enter' && document.getElementById('loginScreen').style.display!=='none') doLogin();
+});
+
+init();
+</script>
+</body>
+</html>
